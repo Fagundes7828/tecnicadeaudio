@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Técnico — Mesa / Medusa / Equipamentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Sistema Técnico</h1>
+      <p class="subtitle">Mesa / Medusa · Equipamentos · Manutenção · Calendário · Roteamento</p>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="dashboard" class="active">Dashboard</button>
+    <button data-tab="canais">Canais</button>
+    <button data-tab="equipamentos">Equipamentos</button>
+    <button data-tab="manutencao">Manutenção</button>
+    <button data-tab="calendario">Calendário</button>
+    <button data-tab="roteamento">Roteamento</button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <section class="view active" id="view-dashboard">
+    <div class="stats-row" id="dashStats"></div>
+    <div class="toolbar">
+      <strong style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:14px; letter-spacing:.5px;">Próximas revisões</strong>
+    </div>
+    <div id="dashUpcoming"></div>
+  </section>
+
+  <!-- CANAIS -->
+  <section class="view" id="view-canais">
+    <div class="toolbar">
+      <input type="text" id="chSearch" placeholder="Buscar canal, instrumento...">
+      <div class="subtabs" id="chModeTabs">
+        <button data-mode="mesa" class="active">Modo Mesa</button>
+        <button data-mode="medusa">Modo Medusa</button>
+      </div>
+      <button id="chPrintBtn">Imprimir / PDF</button>
+      <button id="chResetBtn" class="reset">Restaurar padrão</button>
+      <div class="legend">
+        <span><span class="dot ok"></span>Via medusa</span>
+        <span><span class="dot warn"></span>Local na mesa</span>
+      </div>
+    </div>
+    <div class="grid" id="chGrid"></div>
+  </section>
+
+  <!-- EQUIPAMENTOS -->
+  <section class="view" id="view-equipamentos">
+    <div class="subtabs" id="eqCatTabs"></div>
+    <div class="toolbar">
+      <input type="text" id="eqSearch" placeholder="Buscar equipamento...">
+      <button id="eqAddBtn" class="primary">+ Novo item</button>
+    </div>
+    <div id="eqFormWrap"></div>
+    <div class="grid" id="eqGrid"></div>
+  </section>
+
+  <!-- MANUTENÇÃO -->
+  <section class="view" id="view-manutencao">
+    <div class="stats-row" id="mantStats"></div>
+    <div class="toolbar">
+      <input type="text" id="mantSearch" placeholder="Buscar equipamento...">
+      <div class="legend">
+        <span><span class="dot ok"></span>Ok</span>
+        <span><span class="dot warn"></span>Atenção (≤30 dias)</span>
+        <span><span class="dot danger"></span>Vencido</span>
+      </div>
+    </div>
+    <table class="list-table" id="mantTable">
+      <thead>
+        <tr>
+          <th>Equipamento</th>
+          <th>Categoria</th>
+          <th>Última manutenção</th>
+          <th>Próxima manutenção</th>
+          <th>Status</th>
+          <th>Observações</th>
+        </tr>
+      </thead>
+      <tbody id="mantBody"></tbody>
+    </table>
+  </section>
+
+  <!-- CALENDÁRIO -->
+  <section class="view" id="view-calendario">
+    <div class="cal-nav">
+      <button id="calPrev">‹</button>
+      <div class="month-lbl" id="calMonthLbl"></div>
+      <button id="calNext">›</button>
+      <button id="calToday">Hoje</button>
+      <div class="legend">
+        <span><span class="dot accent"></span>Evento</span>
+        <span><span class="dot warn"></span>Manutenção prevista</span>
+      </div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div style="margin-top:22px;">
+      <div class="toolbar">
+        <strong style="font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:14px; letter-spacing:.5px;" id="calSelLbl">Eventos</strong>
+        <button id="calAddEventBtn" class="primary" style="margin-left:auto;">+ Novo evento</button>
+      </div>
+      <div id="calEventForm"></div>
+      <div id="calEventList"></div>
+    </div>
+  </section>
+
+  <!-- ROTEAMENTO -->
+  <section class="view" id="view-roteamento">
+    <div class="toolbar">
+      <input type="text" id="routeSearch" placeholder="Buscar na cadeia de roteamento...">
+    </div>
+    <div id="routeList"></div>
+  </section>
+
+  <footer>As alterações são salvas automaticamente neste navegador.</footer>
+</div>
+
+<div class="save-flag" id="saveFlag">salvo ✓</div>
+
+<script src="app.js"></script>
+</body>
+</html>
