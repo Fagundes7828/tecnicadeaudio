@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Estrutura Inicial — Sistema Técnico</title>
+<title>eCHO ROUTER</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -25,10 +25,17 @@ body{margin:0;background:radial-gradient(ellipse at top,#1a1d22 0%,var(--bg) 60%
 .wrap{max-width:1240px;margin:0 auto;}
 h1{font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:.5px;font-size:26px;margin:0 0 4px;text-transform:uppercase;}
 .subtitle{color:var(--muted);font-size:13px;margin:0;}
-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:20px;}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:20px;}
+.brand{display:flex;align-items:center;gap:14px;}
+.brand-icon{width:44px;height:44px;flex-shrink:0;}
+.brand-name{display:flex;flex-direction:column;}
+.brand-name h1{font-size:24px;margin:0;letter-spacing:1.5px;}
+.brand-name h1 .e-letter{color:var(--ok);}
+.brand-name h1 .router-part{color:var(--muted);font-size:14px;letter-spacing:2px;font-weight:500;}
 .user-info{display:flex;align-items:center;gap:10px;}
 .user-info img{width:32px;height:32px;border-radius:50%;border:2px solid var(--ok);}
-.user-info .uname{font-size:13px;color:var(--muted);}
+.user-info .uname{font-size:13px;color:var(--text);font-weight:500;}
+.user-info .urole{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
 .user-info button{padding:6px 12px;font-size:11px;}
 nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px;border-bottom:1px solid var(--line);padding-bottom:2px;}
 nav.tabs button{background:transparent;border:none;color:var(--muted);font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.5px;text-transform:uppercase;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;}
@@ -108,8 +115,9 @@ footer{text-align:center;color:var(--muted);font-size:12px;margin-top:36px;}
 <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 <div id="loginScreen" style="display:none;">
   <div class="login-box">
-    <h1>Estrutura Inicial</h1>
-    <p class="subtitle">Sistema Técnico — Mesa / Medusa / Equipamentos</p>
+    <svg viewBox="0 0 80 80" width="64" height="64" style="margin-bottom:16px;"><rect x="4" y="18" width="72" height="48" rx="6" fill="none" stroke="var(--ok)" stroke-width="2.5"/><line x1="16" y1="56" x2="16" y2="34" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="28" y1="56" x2="28" y2="28" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="56" x2="40" y2="38" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="52" y1="56" x2="52" y2="30" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="64" y1="56" x2="64" y2="42" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="30" r="3" fill="var(--ok)"/><circle cx="28" cy="24" r="3" fill="var(--ok)"/><circle cx="40" cy="34" r="3" fill="var(--ok)"/><circle cx="52" cy="26" r="3" fill="var(--ok)"/><circle cx="64" cy="38" r="3" fill="var(--ok)"/></svg>
+    <h1><span style="color:var(--ok)">e</span>CHO ROUTER</h1>
+    <p class="subtitle">Sistema de roteamento e gestão técnica de áudio</p>
     <button class="google-btn" id="googleLoginBtn">
       <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.08 24.08 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
       Entrar com Google
@@ -120,10 +128,13 @@ footer{text-align:center;color:var(--muted);font-size:12px;margin-top:36px;}
 <div id="appScreen">
 <div class="wrap">
   <header>
-    <div><h1>Estrutura Inicial</h1><p class="subtitle">Mesa / Medusa · Equipamentos · Manutenção · Calendário · Roteamento</p></div>
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 80 80"><rect x="4" y="18" width="72" height="48" rx="6" fill="none" stroke="var(--ok)" stroke-width="2.5"/><line x1="16" y1="56" x2="16" y2="34" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="28" y1="56" x2="28" y2="28" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="40" y1="56" x2="40" y2="38" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="52" y1="56" x2="52" y2="30" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="64" y1="56" x2="64" y2="42" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="30" r="3" fill="var(--ok)"/><circle cx="28" cy="24" r="3" fill="var(--ok)"/><circle cx="40" cy="34" r="3" fill="var(--ok)"/><circle cx="52" cy="26" r="3" fill="var(--ok)"/><circle cx="64" cy="38" r="3" fill="var(--ok)"/></svg>
+      <div class="brand-name"><h1><span class="e-letter">e</span>CHO <span class="router-part">ROUTER</span></h1></div>
+    </div>
     <div class="user-info">
       <img id="userPhoto" src="" alt="">
-      <div><div id="userName" class="uname"></div></div>
+      <div><div id="userName" class="uname"></div><div class="urole">Operador</div></div>
       <button id="logoutBtn" class="small">Sair</button>
     </div>
   </header>
