@@ -105,6 +105,15 @@ table.list-table tr:hover td{background:var(--panel-2);}
 footer{text-align:center;color:var(--muted);font-size:12px;margin-top:36px;}
 .save-flag{position:fixed;bottom:18px;right:18px;background:var(--panel-2);border:1px solid var(--line);padding:8px 14px;border-radius:6px;font-size:12px;color:var(--ok);opacity:0;transform:translateY(6px);transition:opacity .2s ease,transform .2s ease;font-family:'Space Mono',monospace;z-index:100;}
 .save-flag.show{opacity:1;transform:translateY(0);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:500;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+.modal-overlay.open{opacity:1;pointer-events:auto;}
+.modal-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:32px 28px;max-width:420px;width:90%;text-align:center;}
+.modal-box h2{font-family:'Oswald',sans-serif;font-size:18px;text-transform:uppercase;letter-spacing:.5px;margin:0 0 12px;color:var(--danger);}
+.modal-box p{color:var(--muted);font-size:14px;margin:0 0 24px;line-height:1.5;}
+.modal-box .modal-actions{display:flex;gap:10px;justify-content:center;}
+.modal-box .modal-actions button{min-width:120px;}
+button.csv-btn{background:var(--accent-dim);color:var(--accent);border-color:#2e5266;}
+.save-flag.show{opacity:1;transform:translateY(0);}
 .loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;}
 .spinner{width:40px;height:40px;border:3px solid var(--line);border-top-color:var(--ok);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -190,11 +199,24 @@ footer{text-align:center;color:var(--muted);font-size:12px;margin-top:36px;}
     </div>
   </section>
   <section class="view" id="view-roteamento">
-    <div class="toolbar"><input type="text" id="routeSearch" placeholder="Buscar na cadeia de roteamento..."></div>
+    <div class="toolbar">
+      <input type="text" id="routeSearch" placeholder="Buscar na cadeia de roteamento...">
+      <button id="csvBtn" class="csv-btn">⬇ Gerar Relatório CSV</button>
+    </div>
     <div id="routeList"></div>
   </section>
   <footer>Dados sincronizados em tempo real para toda a equipe via Firebase.</footer>
 </div>
+</div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h2 id="modalTitle">Confirmar redefinição</h2>
+    <p id="modalMsg">Todos os campos serão apagados e restaurados para o estado original vazio. Esta ação não pode ser desfeita.</p>
+    <div class="modal-actions">
+      <button id="modalCancel">Cancelar</button>
+      <button id="modalConfirm" class="danger-btn">Confirmar redefinição</button>
+    </div>
+  </div>
 </div>
 <div class="save-flag" id="saveFlag">sincronizado ✓</div>
 <script>
@@ -205,8 +227,8 @@ const CH_TIPOS=["Microfone","Instrumento","Computador","Playback","DI","Retorno"
 const EVENT_TIPOS=["Revisão","Troca de cabo","Limpeza","Calibração","Evento"];
 const DOW=['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
 const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const defCh=[{mesa:1,medusa:1,instrumento:"Bumbo",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:2,medusa:2,instrumento:"Caixa",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:3,medusa:3,instrumento:"Hi-Hat",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:4,medusa:4,instrumento:"Tom 1",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:5,medusa:5,instrumento:"Tom 2",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:6,medusa:6,instrumento:"Surdo",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:7,medusa:7,instrumento:"Overhead L",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:8,medusa:8,instrumento:"Overhead R",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:9,medusa:9,instrumento:"Baixo",tipo:"DI",equipamentoId:null,observacoes:""},{mesa:10,medusa:10,instrumento:"Guitarra 1",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:11,medusa:11,instrumento:"Guitarra 2",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:12,medusa:12,instrumento:"Teclado L",tipo:"DI",equipamentoId:null,observacoes:""},{mesa:13,medusa:13,instrumento:"Teclado R",tipo:"DI",equipamentoId:null,observacoes:""},{mesa:14,medusa:14,instrumento:"Voz 1 (Principal)",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:15,medusa:15,instrumento:"Voz 2",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:16,medusa:16,instrumento:"Voz 3",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:17,medusa:17,instrumento:"Voz 4",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:18,medusa:18,instrumento:"Voz 5 (Coro)",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:19,medusa:19,instrumento:"Violão 1",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:20,medusa:20,instrumento:"Violão 2",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:21,medusa:21,instrumento:"Sax",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:22,medusa:22,instrumento:"Trompete",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:23,medusa:23,instrumento:"Percussão 1",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:24,medusa:24,instrumento:"Percussão 2",tipo:"Microfone",equipamentoId:null,observacoes:""},{mesa:25,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:26,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:27,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:28,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:29,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:30,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:31,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:32,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""}];
-const defEq=[{id:"eq1",categoria:"Microfones",nome:"Voz Principal",marca:"Shure",modelo:"SM58",tipo:"Dinâmico",quantidade:1,comprimento:"",ultimaManutencao:"",proximaManutencao:"",observacoes:""},{id:"eq2",categoria:"Microfones",nome:"Bateria Kit",marca:"Shure",modelo:"SM57",tipo:"Dinâmico",quantidade:6,comprimento:"",ultimaManutencao:"",proximaManutencao:"",observacoes:""},{id:"eq3",categoria:"Cabos",nome:"XLR 10m",marca:"Santo Ângelo",modelo:"",tipo:"XLR",quantidade:12,comprimento:"10m",ultimaManutencao:"",proximaManutencao:"",observacoes:""},{id:"eq4",categoria:"Instrumentos",nome:"Violão",marca:"Tagima",modelo:"Dallas",tipo:"Acústico",quantidade:2,comprimento:"",ultimaManutencao:"",proximaManutencao:"",observacoes:""},{id:"eq5",categoria:"Computadores",nome:"Notebook Playback",marca:"Dell",modelo:"",tipo:"",quantidade:1,comprimento:"",ultimaManutencao:"",proximaManutencao:"",observacoes:""},{id:"eq6",categoria:"Mesas",nome:"Mesa Principal 32ch",marca:"Behringer",modelo:"X32",tipo:"",quantidade:1,comprimento:"",ultimaManutencao:"",proximaManutencao:"",observacoes:""}];
+const defCh=[{mesa:1,medusa:1,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:2,medusa:2,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:3,medusa:3,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:4,medusa:4,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:5,medusa:5,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:6,medusa:6,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:7,medusa:7,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:8,medusa:8,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:9,medusa:9,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:10,medusa:10,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:11,medusa:11,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:12,medusa:12,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:13,medusa:13,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:14,medusa:14,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:15,medusa:15,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:16,medusa:16,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:17,medusa:17,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:18,medusa:18,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:19,medusa:19,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:20,medusa:20,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:21,medusa:21,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:22,medusa:22,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:23,medusa:23,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:24,medusa:24,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:25,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:26,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:27,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:28,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:29,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:30,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:31,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""},{mesa:32,medusa:null,instrumento:"",tipo:"",equipamentoId:null,observacoes:""}];
+const defEq=[];
 let state={channels:JSON.parse(JSON.stringify(defCh)),equipment:JSON.parse(JSON.stringify(defEq)),events:[]};
 let chMode="mesa",eqActiveCat=CATEGORIES[0],calDate=new Date(),calSelected=new Date(),showEqForm=false,showEventForm=false;
 const saveFlag=document.getElementById('saveFlag');let saveTimeout,unsubs=[];
@@ -271,7 +293,51 @@ function renderChannels(){
 function applyChF(){const q=document.getElementById('chSearch').value.trim().toLowerCase();document.querySelectorAll('#chGrid .card').forEach(c=>{const i=c.dataset.idx,ch=state.channels[i],eq=eqById(ch.equipamentoId),h=`${ch.mesa} ${ch.medusa||''} ${ch.instrumento} ${ch.tipo} ${ch.observacoes} ${eq?eq.nome:''}`.toLowerCase();c.classList.toggle('hidden',q&&!h.includes(q));});}
 document.getElementById('chSearch').addEventListener('input',applyChF);
 document.getElementById('chPrintBtn').addEventListener('click',()=>window.print());
-document.getElementById('chResetBtn').addEventListener('click',()=>{if(confirm('Restaurar canais para o padrão?')){state.channels=JSON.parse(JSON.stringify(defCh));persistCh();}});
+
+/* MODAL CUSTOMIZADO */
+let modalCallback=null;
+function openModal(title,msg,confirmLabel,onConfirm){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalMsg').textContent=msg;
+  document.getElementById('modalConfirm').textContent=confirmLabel||'Confirmar';
+  modalCallback=onConfirm;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+document.getElementById('modalCancel').addEventListener('click',()=>{document.getElementById('modalOverlay').classList.remove('open');modalCallback=null;});
+document.getElementById('modalConfirm').addEventListener('click',()=>{document.getElementById('modalOverlay').classList.remove('open');if(modalCallback)modalCallback();modalCallback=null;});
+document.getElementById('modalOverlay').addEventListener('click',(e)=>{if(e.target===e.currentTarget){document.getElementById('modalOverlay').classList.remove('open');modalCallback=null;}});
+
+document.getElementById('chResetBtn').addEventListener('click',()=>{
+  openModal('Confirmar redefinição','Todos os campos dos canais serão apagados e restaurados para o estado original vazio. Esta ação não pode ser desfeita.','Redefinir canais',()=>{
+    state.channels=JSON.parse(JSON.stringify(defCh));persistCh();
+  });
+});
+
+/* CSV EXPORT */
+document.getElementById('csvBtn').addEventListener('click',()=>{
+  const BOM='\uFEFF';
+  const header='Canal Mesa;Canal Medusa;Nome do Canal;Tipo;Equipamento;Observações\n';
+  const rows=state.channels.map(ch=>{
+    const eq=eqById(ch.equipamentoId);
+    return [
+      String(ch.mesa).padStart(2,'0'),
+      ch.medusa!==null?String(ch.medusa).padStart(2,'0'):'LOCAL',
+      '"'+(ch.instrumento||'').replace(/"/g,'""')+'"',
+      ch.tipo||'',
+      '"'+((eq?eq.nome+' — '+(eq.marca||''):'')).replace(/"/g,'""')+'"',
+      '"'+(ch.observacoes||'').replace(/"/g,'""')+'"'
+    ].join(';');
+  }).join('\n');
+  const csv=BOM+header+rows;
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  const date=new Date().toISOString().slice(0,10);
+  a.download='echo-router-canais-'+date+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
 
 /* EQUIPAMENTOS */
 function renderEquipCatTabs(){const w=document.getElementById('eqCatTabs');w.innerHTML=CATEGORIES.map(c=>`<button data-cat="${c}" class="${c===eqActiveCat?'active':''}">${c}</button>`).join('');w.querySelectorAll('button').forEach(b=>{b.addEventListener('click',()=>{eqActiveCat=b.dataset.cat;showEqForm=false;renderEquipCatTabs();renderEquipment();});});}
@@ -282,7 +348,7 @@ function renderEqForm(){const w=document.getElementById('eqFormWrap');if(!showEq
 function renderEquipment(){const g=document.getElementById('eqGrid'),items=state.equipment.filter(e=>e.categoria===eqActiveCat);
   g.innerHTML=items.map(it=>{const s=ms(it.proximaManutencao),cc=s==='danger'?'danger':s==='warn'?'local':'';return`<div class="card ${cc}" data-id="${it.id}"><div class="card-top"></div><div class="card-head"><div class="ch-mesa" style="font-size:15px;"><span class="prefix">${esc(it.categoria)}</span>${esc(it.nome)||'Sem nome'}</div></div><div class="card-body"><div class="field"><label>Nome</label><input type="text" data-field="nome" value="${esc(it.nome)}"></div><div class="field"><label>Marca</label><input type="text" data-field="marca" value="${esc(it.marca)}"></div><div class="field"><label>Modelo</label><input type="text" data-field="modelo" value="${esc(it.modelo)}"></div><div class="field"><label>Tipo</label><input type="text" data-field="tipo" value="${esc(it.tipo)}"></div>${it.categoria==='Cabos'?`<div class="field"><label>Comprimento</label><input type="text" data-field="comprimento" value="${esc(it.comprimento)}"></div>`:''}<div class="field"><label>Quantidade</label><input type="number" min="0" data-field="quantidade" value="${it.quantidade}"></div><div class="field"><label>Observações</label><textarea data-field="observacoes">${esc(it.observacoes)}</textarea></div></div><div class="card-foot"><button class="small danger-btn" data-del="${it.id}">Excluir</button></div></div>`;}).join('');
   g.querySelectorAll('.card').forEach(c=>{const id=c.dataset.id;c.querySelectorAll('input,textarea').forEach(inp=>{inp.addEventListener('input',e=>{const it=eqById(id),f=e.target.dataset.field;it[f]=f==='quantidade'?(parseInt(e.target.value)||0):e.target.value;dEq();});});});
-  g.querySelectorAll('[data-del]').forEach(b=>{b.addEventListener('click',()=>{if(!confirm('Excluir este equipamento?'))return;const id=b.dataset.del;state.equipment=state.equipment.filter(e=>e.id!==id);state.channels.forEach(ch=>{if(ch.equipamentoId===id)ch.equipamentoId=null;});persistEq();persistCh();});});
+  g.querySelectorAll('[data-del]').forEach(b=>{b.addEventListener('click',()=>{const id=b.dataset.del;const it=eqById(id);openModal('Excluir equipamento','Tem certeza que deseja excluir "'+((it&&it.nome)||'este item')+'"? Canais vinculados perderão o vínculo.','Excluir',()=>{state.equipment=state.equipment.filter(e=>e.id!==id);state.channels.forEach(ch=>{if(ch.equipamentoId===id)ch.equipamentoId=null;});persistEq();persistCh();});});});
   applyEqF();}
 function applyEqF(){const q=document.getElementById('eqSearch').value.trim().toLowerCase();document.querySelectorAll('#eqGrid .card').forEach(c=>{const id=c.dataset.id,it=eqById(id);if(!it){c.classList.add('hidden');return;}const h=`${it.nome} ${it.marca} ${it.modelo} ${it.tipo}`.toLowerCase();c.classList.toggle('hidden',q&&!h.includes(q));});}
 document.getElementById('eqSearch').addEventListener('input',applyEqF);
